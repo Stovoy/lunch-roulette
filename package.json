@@ -1,0 +1,24 @@
+{
+  "name": "lunch-roulette",
+  "version": "1.0.0",
+  "description": "Lunch Roulette is a simple web app to optimize lunch groupings for meeting different coworkers.",
+  "main": "src/index.js",
+  "dependencies": {
+    "express": "^4.13.4",
+    "mocha": "^2.5.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha $(find src -name '*_test.js')"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swaggy/lunch-roulette.git"
+  },
+  "author": "Swaggy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/swaggy/lunch-roulette/issues"
+  },
+  "homepage": "https://github.com/swaggy/lunch-roulette#readme"
+}

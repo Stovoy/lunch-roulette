@@ -1,6 +1,11 @@
-box: ubuntu
+box: node
 build:
   steps:
+    - npm-install
+    - npm-test
     - script:
-        name: echo hello wercker
-        code: echo "hello wercker"
+        name: echo nodejs information
+        code: |
+          echo "node version $(node -v) running"
+          echo "npm version $(npm -v) running"
+          echo "$(uname -a)"
