@@ -1,0 +1,6 @@
+box: ubuntu
+build:
+  steps:
+    - script:
+        name: echo hello wercker
+        code: echo "hello wercker"
