@@ -12,6 +12,7 @@ push:
         repository: stevemostovoy/lunch-roulette
         tag: $WERCKER_GIT_COMMIT
         ports: "8000"
+        env: "PORT=8000"
         entrypoint: "node src/index.js"
 
 deploy-rancher:
@@ -27,4 +28,4 @@ deploy-rancher:
         docker_org: stevemostovoy
         docker_image: lunch-roulette
         use_tag: true
-        inplace: false
+        inplace: true
