@@ -37,3 +37,4 @@ deploy-rancher:
         docker_image: lunch-roulette
         use_tag: true
         inplace: true
+        start_first: true
