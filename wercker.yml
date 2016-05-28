@@ -4,12 +4,37 @@ build:
     - npm-install
     - npm-test
 
-deploy:
+push:
   steps:
+    - npm-install
+    - script:
+        name: Install to /app
+        code: |
+          mkdir /app
+          mv src /app/src
+          mv node_modules /app/node_modules
+          mv entrypoint.sh /app/entrypoint.sh
     - internal/docker-push:
         username: $USERNAME
         password: $PASSWORD
         repository: stevemostovoy/lunch-roulette
         tag: $WERCKER_GIT_COMMIT
         ports: "8000"
-        entrypoint: "node src/index.js"
+        env: "PORT=8000"
+        entrypoint: "/bin/bash /app/entrypoint.sh"
+
+deploy-rancher:
+  steps:
+    - swaggy/deploy-to-rancher:
+        access_key: $RANCHER_ACCESS_KEY
+        secret_key: $RANCHER_SECRET_KEY
+        rancher_url: $RANCHER_URL
+        https: true
+        tag: $WERCKER_GIT_COMMIT
+        stack_name: LunchRoulette
+        service_name: lunch-roulette
+        docker_org: stevemostovoy
+        docker_image: lunch-roulette
+        use_tag: true
+        inplace: true
+        start_first: true
