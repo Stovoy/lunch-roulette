@@ -16,8 +16,6 @@ push:
 
 deploy-rancher:
   steps:
-    - install-packages:
-        packages: unzip
     - swaggy/deploy-to-rancher:
         access_key: $RANCHER_ACCESS_KEY
         secret_key: $RANCHER_SECRET_KEY
