@@ -4,7 +4,7 @@ build:
     - npm-install
     - npm-test
 
-deploy:
+push:
   steps:
     - internal/docker-push:
         username: $USERNAME
@@ -13,3 +13,18 @@ deploy:
         tag: $WERCKER_GIT_COMMIT
         ports: "8000"
         entrypoint: "node src/index.js"
+
+deploy-rancher:
+  steps:
+    - nhumrich/deploy-to-rancher:
+        access_key: $RANCHER_ACCESS_KEY
+        secret_key: $RANCHER_SECRET_KEY
+        rancher_url: $RANCHER_URL
+        https: true
+        tag: $WERCKER_GIT_COMMIT
+        stack_name: LunchRoulette
+        service_name: lunch-roulette
+        docker_org: https://hub.docker.com
+        docker_image: stevemostovoy/lunch-roulette
+        use_tag: true
+        inplace: false
