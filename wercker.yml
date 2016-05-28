@@ -12,6 +12,7 @@ push:
         code: |
           mkdir /app
           mv src /app/src
+          mv static /app/static
           mv node_modules /app/node_modules
           mv entrypoint.sh /app/entrypoint.sh
     - internal/docker-push:
