@@ -3,9 +3,13 @@ build:
   steps:
     - npm-install
     - npm-test
-    - script:
-        name: echo nodejs information
-        code: |
-          echo "node version $(node -v) running"
-          echo "npm version $(npm -v) running"
-          echo "$(uname -a)"
+
+deploy:
+  steps:
+    - internal/docker-push:
+        username: $USERNAME
+        password: $PASSWORD
+        repository: stevemostovoy/lunch-roulette
+        tag: $WERCKER_GIT_COMMIT
+        ports: "8000"
+        entrypoint: "node src/index.js"
