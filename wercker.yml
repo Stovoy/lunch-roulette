@@ -3,10 +3,15 @@ build:
   steps:
     - npm-install
     - npm-test
+    - internal/docker-push:
+        username: $USERNAME
+        password: $PASSWORD
+        repository: stevemostovoy/lunch-roulette-build
+        tag: $WERCKER_GIT_COMMIT
 
 push:
+  box: stevemostovoy/lunch-roulette-build:$WERCKER_GIT_COMMIT
   steps:
-    - npm-install
     - script:
         name: Install to /app
         code: |
