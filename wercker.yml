@@ -13,21 +13,25 @@ push:
   box: stevemostovoy/lunch-roulette-build:$WERCKER_GIT_COMMIT
   steps:
     - script:
+        name: Install frontend
+        code: |
+          cd frontend && npm-install && ./node_modules/webpack/bin/webpack.js --progress
+    - script:
         name: Install to /app
         code: |
           mkdir /app
           mv src /app/src
-          mv static /app/static
+          mv resources /app/static
           mv node_modules /app/node_modules
-          mv entrypoint.sh /app/entrypoint.sh
     - internal/docker-push:
         username: $USERNAME
         password: $PASSWORD
         repository: stevemostovoy/lunch-roulette
         tag: $WERCKER_GIT_COMMIT
         ports: "8000"
-        env: "PORT=8000"
-        entrypoint: "/bin/bash /app/entrypoint.sh"
+        env:
+          - "PORT=8000"
+        entrypoint: "/bin/bash /app/resources/entrypoint.sh"
 
 deploy-rancher:
   steps:
