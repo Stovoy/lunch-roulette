@@ -12,16 +12,22 @@ build:
 push:
   box: stevemostovoy/lunch-roulette-build:$WERCKER_GIT_COMMIT
   steps:
+    - npm-install:
+        cwd: frontend
     - script:
         name: Install frontend
-        code: |
-          cd frontend && npm-install && ./node_modules/webpack/bin/webpack.js --progress
+        code: ./node_modules/webpack/bin/webpack.js --progress
+        cwd: frontend
+    - script:
+        name: Install nginx
+        code: apt-get update && apt-get -y install nginx
     - script:
         name: Install to /app
         code: |
           mkdir /app
+          mkdir /app/logs
           mv src /app/src
-          mv resources /app/static
+          mv resources /app/resources
           mv node_modules /app/node_modules
     - internal/docker-push:
         username: $USERNAME

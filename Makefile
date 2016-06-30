@@ -16,7 +16,7 @@ build:
 	docker rm -f lunch-roulette || true
 
 watch:
-	cd frontend && make watch
+	make -C frontend watch
 
 run: build
 	docker run \
