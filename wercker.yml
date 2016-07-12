@@ -15,8 +15,7 @@ push:
     - script:
         name: Install frontend
         code: |
-          echo $SLACK_CLIENT_ID
-          cd frontend && npm-install && MINIFY=1 ./node_modules/webpack/bin/webpack.js --progress
+          cd frontend && npm install && MINIFY=1 ./node_modules/webpack/bin/webpack.js --progress
     - script:
         name: Install to /app
         code: |
