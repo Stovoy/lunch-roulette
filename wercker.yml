@@ -12,10 +12,12 @@ build:
 push:
   box: stevemostovoy/lunch-roulette-build:$WERCKER_GIT_COMMIT
   steps:
+    - npm-install:
+        cwd: frontend
     - script:
-        name: Install frontend
+        name: Compile frontend
         code: |
-          cd frontend && npm install && MINIFY=1 ./node_modules/webpack/bin/webpack.js --progress
+          MINIFY=1 ./frontend/node_modules/webpack/bin/webpack.js --progress
     - script:
         name: Install to /app
         code: |
