@@ -32,6 +32,7 @@ deploy:
           - "SLACK_TEAM=$SLACK_TEAM"
           - "SLACK_CLIENT_ID=$SLACK_CLIENT_ID"
           - "SLACK_CLIENT_SECRET=$SLACK_CLIENT_SECRET"
+          - "PGHOST=$$DATABASE_HOST"
         entrypoint: "/bin/bash /app/resources/entrypoint.sh"
     - swaggy/deploy-to-rancher:
         access_key: $RANCHER_ACCESS_KEY
