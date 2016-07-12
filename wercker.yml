@@ -13,15 +13,11 @@ build:
     - npm-install:
         cwd: frontend
     - script:
-        name: Compile frontend
-        code: |
-          MINIFY=1 ./node_modules/webpack/bin/webpack.js --progress
-        cwd: frontend
-    - script:
         name: Install to /app
         code: |
           mkdir /app
           mv src /app/src
+          mv frontend /app/frontend
           mv resources /app/resources
           mv node_modules /app/node_modules
           mkdir /app/logs

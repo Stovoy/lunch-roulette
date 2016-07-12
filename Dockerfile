@@ -7,7 +7,8 @@ RUN ln -s /usr/bin/nodejs /usr/bin/node
 RUN apt-get -y install ca-certificates
 
 ADD src /app/src
-ADD resources/ /app/resources
+ADD frontend /app/frontend
+ADD resources /app/resources
 ADD node_modules /app/node_modules
 RUN mkdir -p /app/logs
 
