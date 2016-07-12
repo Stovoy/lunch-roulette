@@ -24,6 +24,7 @@ build:
           mv src /app/src
           mv resources /app/resources
           mv node_modules /app/node_modules
+          mkdir /app/logs
     - internal/docker-push:
         username: $USERNAME
         password: $PASSWORD
