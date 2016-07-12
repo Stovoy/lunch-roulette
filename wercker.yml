@@ -4,6 +4,12 @@ build:
     - npm-install
     - npm-test
 
+    - script:
+        name: Install dependencies
+        code: |
+          apt-get update
+          apt-get install -y nginx
+
     - npm-install:
         cwd: frontend
     - script:
@@ -11,7 +17,6 @@ build:
         code: |
           MINIFY=1 ./node_modules/webpack/bin/webpack.js --progress
         cwd: frontend
-
     - script:
         name: Install to /app
         code: |
@@ -28,6 +33,9 @@ build:
         env:
           - "PORT=8000"
           - "MODE=release"
+          - "SLACK_TEAM=$SLACK_TEAM"
+          - "SLACK_CLIENT_ID=$SLACK_CLIENT_ID"
+          - "SLACK_CLIENT_SECRET=$SLACK_CLIENT_SECRET"
         entrypoint: "/bin/bash /app/resources/entrypoint.sh"
 
 deploy-rancher:
