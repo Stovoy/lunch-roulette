@@ -1,5 +1,5 @@
 box: node
-build:
+deploy:
   steps:
     - npm-install
     - npm-test
@@ -34,9 +34,6 @@ build:
           - "SLACK_CLIENT_ID=$SLACK_CLIENT_ID"
           - "SLACK_CLIENT_SECRET=$SLACK_CLIENT_SECRET"
         entrypoint: "/bin/bash /app/resources/entrypoint.sh"
-
-deploy-rancher:
-  steps:
     - swaggy/deploy-to-rancher:
         access_key: $RANCHER_ACCESS_KEY
         secret_key: $RANCHER_SECRET_KEY
