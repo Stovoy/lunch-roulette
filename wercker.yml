@@ -15,7 +15,8 @@ push:
     - script:
         name: Install frontend
         code: |
-          cd frontend && npm-install && ./node_modules/webpack/bin/webpack.js --progress
+          echo $SLACK_CLIENT_ID
+          cd frontend && npm-install && MINIFY=1 ./node_modules/webpack/bin/webpack.js --progress
     - script:
         name: Install to /app
         code: |
@@ -31,6 +32,7 @@ push:
         ports: "8000"
         env:
           - "PORT=8000"
+          - "MODE=release"
         entrypoint: "/bin/bash /app/resources/entrypoint.sh"
 
 deploy-rancher:

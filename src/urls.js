@@ -3,40 +3,55 @@
  */
 
 var auth = require('./auth');
+var user = require('./data/user');
 
 exports.createEndpoints = function () {
     var endpoints = {
         get: {},
         post: {}
     };
+
+    var GET = 'get';
+    var POST = 'post';
     var endpoint = function (name, method, path, handler) {
         var endpoint = {
             path: path,
             handler: handler
         };
-        if (method == get) {
+        if (method == GET) {
             endpoints.get[name] = endpoint;
-        } else if (method == post) {
+        } else if (method == POST) {
             endpoints.post[name] = endpoint;
         }
     };
-    var get = 'get';
-    var post = 'post';
 
-    var feed = endpoint('feed', get, '/api/feed/', function(req, res) {
-        /** Serves the feed */
-        if (!auth.validate(req, res)) return;
-        res.send(JSON.stringify({feed: true}));
+    var loginWithSlack = endpoint('loginWithSlack', POST, '/api/login/slack', function (req, res) {
+        auth.slackAuth(req.body.code, res);
     });
 
-    var loginwithGmail = endpoint('loginGmail', post, '/api/login/gmail', function(req, res) {
-        console.log('login - gmail');
-        res.send(JSON.stringify({login: 'gmail'}));
+
+    // Wrapper for endpoints that needs a valid session key.
+    var authEndpoint = function (name, method, path, handler) {
+        endpoint(name, method, path, function (req, res) {
+            auth.getUserId(req, res, function (userId) {
+                if (userId == null) return;
+                handler(req, res, userId);
+            });
+        });
+    };
+
+    var logoutUser = authEndpoint('logoutUser', POST, '/api/logout/', function (req, res, userId) {
+        /** Fetch user info */
+        user.logout(userId, function (userInfo) {
+            res.end();
+        });
     });
 
-    var loginWithSlack = endpoint('loginSlack', post, '/api/login/slack', function(req, res) {
-        console.log('login - slack');
-        res.send(JSON.stringify({login: 'slack'}));
+    var fetchUser = authEndpoint('fetchUser', GET, '/api/user/', function (req, res, userId) {
+        /** Fetch user info */
+        user.getUserById(userId, function (userInfo) {
+            res.send(JSON.stringify(userInfo));
+        });
     });
 
     return endpoints;
