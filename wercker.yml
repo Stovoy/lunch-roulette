@@ -3,13 +3,12 @@ deploy:
   steps:
     - npm-install
     - npm-test
-
     - script:
         name: Install dependencies
         code: |
           apt-get update
           apt-get install -y nginx
-
+          ln -s /usr/bin/nodejs /usr/bin/node
     - npm-install:
         cwd: frontend
     - script:
