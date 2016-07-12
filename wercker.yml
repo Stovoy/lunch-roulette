@@ -6,10 +6,9 @@ deploy:
     - script:
         name: Install dependencies
         code: |
-          which node
           apt-get update
           apt-get install -y nginx
-          ln -s /usr/bin/nodejs /usr/bin/node
+          ln -s /usr/local/bin/nodejs /usr/local/bin/node
     - npm-install:
         cwd: frontend
     - script:
