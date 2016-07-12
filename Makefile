@@ -30,6 +30,7 @@ run:
 		-v $(shell pwd)/src:/app/src \
 		-v $(shell pwd)/resources:/app/resources \
 		-v $(shell pwd)/node_modules:/app/node_modules \
+		-e SLACK_TEAM=$$SLACK_TEAM \
 		-e SLACK_CLIENT_ID=$$SLACK_CLIENT_ID \
 		-e SLACK_CLIENT_SECRET=$$SLACK_CLIENT_SECRET \
 		--link lunch-roulette-db:$(PGHOST) \

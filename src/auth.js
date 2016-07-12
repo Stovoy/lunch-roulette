@@ -46,7 +46,7 @@ module.exports = {
                             res.send(JSON.stringify({session: session}));
                         });
                 } else {
-                    res.send(JSON.stringify({error: 'Invalid response from Slack.'}))
+                    res.send(JSON.stringify(data))
                 }
             },
             error: function (data) {
