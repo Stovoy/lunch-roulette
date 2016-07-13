@@ -33,6 +33,8 @@ run:
 		-e SLACK_TEAM=$$SLACK_TEAM \
 		-e SLACK_CLIENT_ID=$$SLACK_CLIENT_ID \
 		-e SLACK_CLIENT_SECRET=$$SLACK_CLIENT_SECRET \
+		-e MAP_URL=$$MAP_URL \
+		-e MAP_MASK_URL=$$MAP_MASK_URL \
 		--link lunch-roulette-db:$(PGHOST) \
 		-e PGHOST=$(PGHOST) \
 		-e PGPORT=$(PGPORT) \

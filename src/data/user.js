@@ -19,8 +19,8 @@ function getUserByEmail(email, done) {
 
 function newUser(name, email, done) {
     db.query(
-        'INSERT INTO USER_PROFILE (name, email, x, y) ' +
-        'VALUES ($1::text, $2::text, -1, -1) ' +
+        'INSERT INTO USER_PROFILE (name, email, is_admin, x, y) ' +
+        'VALUES ($1::text, $2::text, false, -1, -1) ' +
         'RETURNING id',
         [name, email],
         function (result) {
@@ -82,7 +82,40 @@ function logout(userId, done) {
         function () {
            done();
         });
+}
 
+function getUserById(userId, done) {
+    db.query(
+        'SELECT name, email, is_admin, x, y ' +
+        'FROM USER_PROFILE AS profile ' +
+        'WHERE profile.id = $1::integer',
+        [userId],
+        function (result) {
+            var rows = result.rows;
+            if (rows.length == 1) {
+                done(rows[0]);
+            } else {
+                done(null);
+            }
+        }
+    );
+}
+
+function userIsAdmin(userId, done) {
+    db.query(
+        'SELECT is_admin ' +
+        'FROM USER_PROFILE as profile ' +
+        'WHERE profile.id = $1::integer',
+        [userId],
+        function (result) {
+            var rows = result.rows;
+            if (rows.length == 1) {
+                done(!!(rows[0]['is_admin']));
+            } else {
+                done(null);
+            }
+        }
+    )
 }
 
 function getOrCreateSession(name, email, done) {
@@ -107,23 +140,6 @@ function getOrCreateSession(name, email, done) {
     });
 }
 
-function getUserById(userId, done) {
-    db.query(
-        'SELECT name, email, x, y ' +
-        'FROM USER_PROFILE AS profile ' +
-        'WHERE profile.id = $1::integer',
-        [userId],
-        function (result) {
-            var rows = result.rows;
-            if (rows.length == 1) {
-                done(rows[0]);
-            } else {
-                done(null);
-            }
-        }
-    );
-}
-
 module.exports = {
     getUserByEmail,
     newUser,
@@ -131,7 +147,8 @@ module.exports = {
     getUserIdBySession,
     login,
     logout,
-    getOrCreateSession,
-    getUserById
+    getUserById,
+    userIsAdmin,
+    getOrCreateSession
 };
 

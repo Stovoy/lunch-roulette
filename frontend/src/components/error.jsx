@@ -1,12 +1,14 @@
 import React from 'react';
 
-import Snackbar from 'material-ui/Snackbar';
-
 import { ErrorType } from '../api';
 import { Login, deleteCookie } from './auth';
 
 export function hasError(data) {
     return !!data.error;
+}
+
+export function notAnAdmin(data) {
+    return data.error && data.error.type == ErrorType.Auth && data.error.message == 'Not an admin';
 }
 
 export var Error = React.createClass({
@@ -16,14 +18,6 @@ export var Error = React.createClass({
             if (this.props.error.message == 'Invalid session') {
                 deleteCookie();
             }
-            var snackBar = (
-                <Snackbar
-                    open={true}
-                    message={'Unauthorized: ' + this.props.error.message}
-                    autoHideDuration={2000}
-                    onRequestClose={this.handleRequestClose}/>
-            );
-            // Use the snackbar? Don't want it after logout or on first load.
             return (
                 <div>
                     <Login/>

@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 RUN apt-get update
-RUN apt-get -y install nodejs nginx
+RUN apt-get -y install curl nodejs nginx
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 RUN apt-get -y install ca-certificates

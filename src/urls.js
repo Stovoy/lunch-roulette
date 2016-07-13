@@ -3,6 +3,7 @@
  */
 
 var auth = require('./auth');
+var admin = require('./data/admin');
 var user = require('./data/user');
 
 exports.createEndpoints = function () {
@@ -42,7 +43,7 @@ exports.createEndpoints = function () {
 
     var logoutUser = authEndpoint('logoutUser', POST, '/api/logout/', function (req, res, userId) {
         /** Fetch user info */
-        user.logout(userId, function (userInfo) {
+        user.logout(userId, function () {
             res.end();
         });
     });
@@ -51,6 +52,29 @@ exports.createEndpoints = function () {
         /** Fetch user info */
         user.getUserById(userId, function (userInfo) {
             res.send(JSON.stringify(userInfo));
+        });
+    });
+
+    // Wrapper for endpoints that can only be accessed by an admin.
+    var adminEndpoint = function (name, method, path, handler) {
+        endpoint(name, method, path, function (req, res) {
+            auth.getUserId(req, res, function (userId) {
+                if (userId == null) return;
+                user.userIsAdmin(userId, function (isAdmin) {
+                    if (isAdmin == true) {
+                        handler(req, res, userId);
+                    } else {
+                        res.send(JSON.stringify({authError: 'Not an admin'}));
+                    }
+                });
+            });
+        });
+    };
+
+    var fetchAdmin = adminEndpoint('adminInfo', GET, '/api/admin/', function (req, res, userId) {
+        /** Fetch admin info */
+        admin.getAdminInfo(function (adminInfo) {
+            res.send(JSON.stringify(adminInfo));
         });
     });
 

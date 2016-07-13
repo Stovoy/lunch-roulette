@@ -27,11 +27,12 @@ deploy:
         tag: $WERCKER_GIT_COMMIT
         ports: "8000"
         env:
-          - "PORT=8000"
           - "MODE=release"
           - "SLACK_TEAM=$SLACK_TEAM"
           - "SLACK_CLIENT_ID=$SLACK_CLIENT_ID"
           - "SLACK_CLIENT_SECRET=$SLACK_CLIENT_SECRET"
+          - "MAP_URL=$MAP_URL"
+          - "MAP_MASK_URL=$MAP_MASK_URL"
           - "PGHOST=$$DATABASE_HOST"
         entrypoint: "/bin/bash /app/resources/entrypoint.sh"
     - swaggy/deploy-to-rancher:

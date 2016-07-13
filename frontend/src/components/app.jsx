@@ -1,15 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router';
 
 import AppBar from 'material-ui/AppBar';
 import LinearProgress from 'material-ui/LinearProgress';
-import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
+import Divider from 'material-ui/Divider';
 
 import { API, ErrorType } from '../api';
 import { deleteCookie } from './auth';
-import { hasError, Error } from './error';
+import { hasError, notAnAdmin, Error } from './error';
 
 export var App = React.createClass({
     getInitialState() {
@@ -19,13 +20,28 @@ export var App = React.createClass({
         this.getUser();
     },
     render() {
-        var content;
+        var content = null;
+        var snackBar = null;
         if (this.state.error) {
-            content = (
-                <Error error={this.state.error}/>
-            );
-        } else if (this.state.user) {
-            content = (<User user={this.state.user}/>);
+            if (notAnAdmin(this.state)) {
+                snackBar = (
+                    <Snackbar open={true}
+                              message={this.state.error.message}
+                              autoHideDuration={2000}
+                              onRequestClose={this.handleRequestClose}/>
+                );
+            } else {
+                content = (
+                    <Error error={this.state.error}/>
+                );
+            }
+        }
+        if (content == null) {
+            if (this.state.admin) {
+                content = (<Admin back={this.getUser} data={this.state.admin}/>);
+            } else if (this.state.user) {
+                content = (<User user={this.state.user}/>);
+            }
         }
         var loading;
         if (this.state.loading) {
@@ -39,16 +55,18 @@ export var App = React.createClass({
             <div>
                 <LunchRouletteBar title="Lunch Roulette"
                                   user={this.state.user}
+                                  admin={this.administrate}
                                   logout={this.logout}/>
                 <div className="loading-bar">
                     {loading}
                 </div>
                 {content}
+                {snackBar}
             </div>
         )
     },
     getUser() {
-        this.loadingWrapper(function(done) {
+        this.loadingWrapper(function (done) {
             API.user(function (data) {
                 if (hasError(data)) {
                     this.replaceState({error: data.error});
@@ -59,8 +77,20 @@ export var App = React.createClass({
             }.bind(this));
         }.bind(this));
     },
+    administrate() {
+        this.loadingWrapper(function (done) {
+           API.admin(function (data) {
+               if (hasError(data)) {
+                   this.setState({error: data.error});
+               } else {
+                   this.setState({admin: data});
+               }
+               done();
+           }.bind(this));
+        }.bind(this));
+    },
     logout() {
-        this.loadingWrapper(function(done) {
+        this.loadingWrapper(function (done) {
             API.logout(function (data) {
                 if (hasError(data)) {
                     this.replaceState({error: data.error});
@@ -71,7 +101,6 @@ export var App = React.createClass({
                 done();
             }.bind(this));
         }.bind(this));
-
     },
     loadingWrapper(call) {
         // How long to wait until showing the loading bar.
@@ -82,7 +111,7 @@ export var App = React.createClass({
             timerRunning = false;
         }.bind(this), loadingTimeout);
 
-        call(function() {
+        call(function () {
             if (timerRunning) {
                 clearTimeout(showLoadingBar);
             } else {
@@ -92,17 +121,44 @@ export var App = React.createClass({
     }
 });
 
+/*
+ margin: 7px 0px 0px;
+ color: rgb(255, 255, 255);
+ */
 var LunchRouletteBar = React.createClass({
     render() {
         var content = null;
         if (this.props.user) {
-            content = (
-                <AppBar title={this.props.title}
-                        iconElementRight={
-                            <FlatButton label="Logout"
-                                        onClick={this.props.logout}/>
-                        }/>
+            var buttonStyle = {margin: '7px 0px 0px', color: 'rgb(255, 255, 255)'};
+            var adminButton = (
+                <FlatButton label='Admin'
+                            onClick={this.props.admin}
+                            style={buttonStyle}/>
             );
+            var logoutButton = (
+                <FlatButton label='Logout'
+                            onClick={this.props.logout}
+                            style={buttonStyle}/>
+            );
+            var buttonDivStyle = {marginTop: '8px', marginRight: '-16px', marginLeft: 'auto'};
+            if (this.props.user.is_admin) {
+                content = (
+                    <AppBar title={this.props.title}>
+                        <div style={buttonDivStyle}>
+                            {adminButton}
+                            {logoutButton}
+                        </div>
+                    </AppBar>
+                );
+            } else {
+                content = (
+                    <AppBar title={this.props.title}>
+                        <div style={buttonDivStyle}>
+                            {logoutButton}
+                        </div>
+                    </AppBar>
+                );
+            }
         } else {
             content = (
                 <AppBar title={this.props.title}/>
@@ -125,7 +181,38 @@ var User = React.createClass({
                 <br/>
                 Name: {this.props.user.name}<br/>
                 Email: {this.props.user.email}<br/>
+                <br/>
+                <Map/>
             </div>
+        )
+    }
+});
+
+var Admin = React.createClass({
+    render() {
+        var users = this.props.data.users;
+        return (
+            <div>
+                <br/>
+                {users.map(function(user, i) {
+                    return (
+                        <div>
+                            <span key={i}>{user.email}</span>
+                            <Divider/>
+                        </div>
+                    )
+                })}
+                <RaisedButton label='Back'
+                              onClick={this.props.back}/>
+            </div>
+        )
+    }
+});
+
+var Map = React.createClass({
+    render() {
+        return (
+            <img src="/map/map.png"/>
         )
     }
 });

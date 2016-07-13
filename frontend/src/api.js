@@ -37,6 +37,19 @@ export var API = {
             },
             error: handleError(done)
         });
+    },
+
+    admin: function (done) {
+        $.ajax({
+            url: '/api/admin',
+            type: 'GET',
+            success: function (data) {
+                data = JSON.parse(data);
+                if (handleAuthError(data, done)) return;
+                done(data);
+            },
+            error: handleError(done)
+        });
     }
 };
 
