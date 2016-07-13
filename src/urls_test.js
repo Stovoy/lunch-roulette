@@ -10,7 +10,8 @@ describe('urls.js', function() {
         it('should create the expected endpoints', function() {
             // Basic check that endpoints exist.
             assert('fetchUser' in endpoints.get);
-            assert.equal(Object.keys(endpoints.get).length, 1);
+            assert('adminInfo' in endpoints.get);
+            assert.equal(Object.keys(endpoints.get).length, 2);
 
             assert('loginWithSlack' in endpoints.post);
             assert('logoutUser' in endpoints.post);
