@@ -10,6 +10,7 @@ import Divider from 'material-ui/Divider';
 
 import { API, ErrorType } from '../api';
 import { deleteCookie } from './auth';
+import { Map } from './map';
 import { hasError, notAnAdmin, Error } from './error';
 
 export var App = React.createClass({
@@ -205,14 +206,6 @@ var Admin = React.createClass({
                 <RaisedButton label='Back'
                               onClick={this.props.back}/>
             </div>
-        )
-    }
-});
-
-var Map = React.createClass({
-    render() {
-        return (
-            <img src="/map/map.png"/>
         )
     }
 });

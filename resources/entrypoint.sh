@@ -22,7 +22,7 @@ check_vars
 
 mkdir -p /app/resources/map
 echo "Downloading Map: $MAP_URL"
-curl -o /app/resources/map/map.png "$MAP_URL"
+curl -o /app/resources/map/map.svg "$MAP_URL"
 echo "Downloading Map Mask: $MAP_MASK_URL"
 curl -o /app/resources/map/map-mask.png "$MAP_MASK_URL"
 
