@@ -38,9 +38,20 @@ export var Error = React.createClass({
             return (
                 <div className="error">
                     <h1>{message}</h1>
-                    <h2>There was an error communicating with the server.</h2>
+                    <h2>Sorry, there was a problem communicating with Lunch Roulette.</h2>
                     <p>
                         <i>{this.props.details}</i>
+                    </p>
+                </div>
+            );
+        }
+        if (type == ErrorType.Server) {
+            return (
+                <div className="error">
+                    <h1>{message}</h1>
+                    <h2>Sorry, Lunch Roulette returned an error.</h2>
+                    <p>
+                        <i>{this.props.error.message}</i>
                     </p>
                 </div>
             );

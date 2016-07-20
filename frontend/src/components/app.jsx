@@ -1,5 +1,6 @@
 import React from 'react';
 
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import LinearProgress from 'material-ui/LinearProgress';
 import FlatButton from 'material-ui/FlatButton';
@@ -7,18 +8,22 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Snackbar from 'material-ui/Snackbar';
 import Divider from 'material-ui/Divider';
+import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+
+
+import { Grid, Row, Col } from 'react-flexbox-grid';
 
 import { API, ErrorType } from '../api';
 import { deleteCookie } from './auth';
 import { Map } from './map';
-import { hasError, notAnAdmin, Error } from './error';
+import { Error, hasError, notAnAdmin } from './error';
 
 export var App = React.createClass({
     getInitialState() {
         return {}
     },
     componentDidMount() {
-        this.getUser();
+        this.getGeneral();
     },
     render() {
         var content = null;
@@ -39,9 +44,9 @@ export var App = React.createClass({
         }
         if (content == null) {
             if (this.state.admin) {
-                content = (<Admin back={this.getUser} data={this.state.admin}/>);
-            } else if (this.state.user) {
-                content = (<User user={this.state.user}/>);
+                content = (<Admin back={this.getGeneral} data={this.state.admin}/>);
+            } else if (this.state.general) {
+                content = (<General move={this.move} {...this.state.general}/>);
             }
         }
         var loading;
@@ -66,13 +71,13 @@ export var App = React.createClass({
             </div>
         )
     },
-    getUser() {
+    getGeneral() {
         this.loadingWrapper(function (done) {
-            API.user(function (data) {
+            API.general(function (data) {
                 if (hasError(data)) {
                     this.replaceState({error: data.error});
                 } else {
-                    this.replaceState({user: data});
+                    this.replaceState({general: data});
                 }
                 done();
             }.bind(this));
@@ -80,15 +85,27 @@ export var App = React.createClass({
     },
     administrate() {
         this.loadingWrapper(function (done) {
-           API.admin(function (data) {
-               if (hasError(data)) {
-                   this.setState({error: data.error});
-               } else {
-                   this.setState({admin: data});
-               }
-               done();
-           }.bind(this));
+            API.admin(function (data) {
+                if (hasError(data)) {
+                    this.setState({error: data.error});
+                } else {
+                    this.setState({admin: data});
+                }
+                done();
+            }.bind(this));
         }.bind(this));
+    },
+    move(x, y) {
+        this.loadingWrapper(function (done) {
+            API.move(x, y, function (data) {
+                if (hasError(data)) {
+                    this.setState({error: data.error});
+                } else {
+                    this.getGeneral();
+                }
+                done();
+            }.bind(this));
+        }.bind(this))
     },
     logout() {
         this.loadingWrapper(function (done) {
@@ -122,10 +139,16 @@ export var App = React.createClass({
     }
 });
 
-/*
- margin: 7px 0px 0px;
- color: rgb(255, 255, 255);
- */
+export var AppWrapper = React.createClass({
+    render() {
+        return (
+            <MuiThemeProvider>
+                <App/>
+            </MuiThemeProvider>
+        )
+    }
+});
+
 var LunchRouletteBar = React.createClass({
     render() {
         var content = null;
@@ -173,17 +196,40 @@ var LunchRouletteBar = React.createClass({
     }
 });
 
-var User = React.createClass({
+var General = React.createClass({
     render() {
-        // X: {this.props.user.x}
-        // Y: {this.props.user.y}
+        var user = this.props.user;
+        var firstName = user.name.split(' ')[0];
+        var text = null;
+        if (user.x == -1 || user.y == -1) {
+            text = (
+                <div>
+                    Welcome to Lunch Roulette, {firstName}! Please select where you work on the map.
+                </div>
+            )
+        } else {
+            text = (
+                <span>
+                    Hi {firstName}. Feel free to edit where you are on the map.
+                </span>
+            )
+        }
         return (
             <div>
                 <br/>
-                Name: {this.props.user.name}<br/>
-                Email: {this.props.user.email}<br/>
-                <br/>
-                <Map/>
+                <Row>
+                    <Col>
+                        {text}
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Map {...this.props.map}
+                            move={this.props.move}
+                            user={this.props.user}
+                            otherUsers={this.props.otherUsers}/>
+                    </Col>
+                </Row>
             </div>
         )
     }
@@ -194,17 +240,44 @@ var Admin = React.createClass({
         var users = this.props.data.users;
         return (
             <div>
-                <br/>
-                {users.map(function(user, i) {
-                    return (
-                        <div>
-                            <span key={i}>{user.email}</span>
-                            <Divider/>
-                        </div>
-                    )
-                })}
+                <Table>
+                    <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                        <TableRow>
+                            <TableHeaderColumn>ID</TableHeaderColumn>
+                            <TableHeaderColumn>Name</TableHeaderColumn>
+                            <TableHeaderColumn>Email</TableHeaderColumn>
+                            <TableHeaderColumn>Admin</TableHeaderColumn>
+                            <TableHeaderColumn>X</TableHeaderColumn>
+                            <TableHeaderColumn>Y</TableHeaderColumn>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody displayRowCheckbox={false}>
+                        {users.map(function (user, i) {
+                            if (user.x == -1 || user.y == -1) {
+                                user.x = 'Not set';
+                                user.y = 'Not set';
+                            }
+                            if (user.is_admin) {
+                                user.admin = 'true';
+                            } else {
+                                user.admin = 'false';
+                            }
+                            return (
+                                <TableRow key={i}>
+                                    <TableRowColumn>{user.id}</TableRowColumn>
+                                    <TableRowColumn>{user.name}</TableRowColumn>
+                                    <TableRowColumn>{user.email}</TableRowColumn>
+                                    <TableRowColumn>{user.admin}</TableRowColumn>
+                                    <TableRowColumn>{user.x}</TableRowColumn>
+                                    <TableRowColumn>{user.y}</TableRowColumn>
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                </Table>
                 <RaisedButton label='Back'
-                              onClick={this.props.back}/>
+                              onClick={this.props.back}
+                              style={{marginTop: '10px'}}/>
             </div>
         )
     }

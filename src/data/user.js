@@ -1,5 +1,6 @@
-var db = require('./db');
 var uuid = require('node-uuid');
+
+var db = require('./db');
 
 function getUserByEmail(email, done) {
     db.query(
@@ -140,6 +141,19 @@ function getOrCreateSession(name, email, done) {
     });
 }
 
+function getOtherUsers(userId, done) {
+    db.query(
+        'SELECT name, x, y ' +
+        'FROM USER_PROFILE AS profile ' +
+        'WHERE profile.id != $1::integer ' +
+        'ORDER BY profile.id',
+        [userId],
+        function (result) {
+            done(result.rows);
+        }
+    );
+}
+
 module.exports = {
     getUserByEmail,
     newUser,
@@ -149,6 +163,7 @@ module.exports = {
     logout,
     getUserById,
     userIsAdmin,
-    getOrCreateSession
+    getOrCreateSession,
+    getOtherUsers
 };
 

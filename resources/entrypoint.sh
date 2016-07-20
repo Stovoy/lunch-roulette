@@ -21,10 +21,10 @@ check_vars() {
 check_vars
 
 mkdir -p /app/resources/map
-echo "Downloading Map: $MAP_URL"
-curl -o /app/resources/map/map.svg "$MAP_URL"
-echo "Downloading Map Mask: $MAP_MASK_URL"
-curl -o /app/resources/map/map-mask.png "$MAP_MASK_URL"
+echo "Downloading map: $MAP_URL"
+curl -so /app/resources/map/map.svg "$MAP_URL"
+echo "Downloading map mask: $MAP_MASK_URL"
+curl -so /app/resources/map/map-mask.png "$MAP_MASK_URL"
 
 /usr/sbin/nginx -c /app/resources/nginx.conf -p /app/
 cd /app

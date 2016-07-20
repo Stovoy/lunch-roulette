@@ -20,19 +20,23 @@ export var API = {
             url: '/api/logout',
             type: 'POST',
             success: function (data) {
+                if (data.length > 0) {
+                    data = JSON.parse(data);
+                    if (handleServerError(data, done)) return;
+                }
                 done(data);
             },
             error: handleError(done)
         });
     },
 
-    user: function (done) {
+    general: function (done) {
         $.ajax({
-            url: '/api/user',
+            url: '/api/general',
             type: 'GET',
             success: function (data) {
                 data = JSON.parse(data);
-                if (handleAuthError(data, done)) return;
+                if (handleServerError(data, done)) return;
                 done(data);
             },
             error: handleError(done)
@@ -45,7 +49,23 @@ export var API = {
             type: 'GET',
             success: function (data) {
                 data = JSON.parse(data);
-                if (handleAuthError(data, done)) return;
+                if (handleServerError(data, done)) return;
+                done(data);
+            },
+            error: handleError(done)
+        });
+    },
+
+    move: function (x, y, done) {
+        $.ajax({
+            url: '/api/move',
+            data: {x: x, y: y},
+            type: 'POST',
+            success: function (data) {
+                if (data.length > 0) {
+                    data = JSON.parse(data);
+                    if (handleServerError(data, done)) return;
+                }
                 done(data);
             },
             error: handleError(done)
@@ -55,7 +75,8 @@ export var API = {
 
 export var ErrorType = {
     Auth: 0,
-    HTTP: 1
+    HTTP: 1,
+    Server: 2
 };
 
 function handleError(done) {
@@ -71,7 +92,8 @@ function handleError(done) {
     }
 }
 
-function handleAuthError(data, done) {
+function handleServerError(data, done) {
+    var error = false;
     if (data.authError) {
         done({
             error: {
@@ -79,6 +101,13 @@ function handleAuthError(data, done) {
                 message: data.authError
             }
         });
+    } else if (data.serverError) {
+        done({
+            error: {
+                type: ErrorType.Server,
+                message: data.serverError
+            }
+        });
     }
-    return !!data.authError;
+    return error;
 }

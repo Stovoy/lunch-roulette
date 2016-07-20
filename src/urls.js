@@ -5,6 +5,7 @@
 var auth = require('./auth');
 var admin = require('./data/admin');
 var user = require('./data/user');
+var map = require('./data/map');
 
 exports.createEndpoints = function () {
     var endpoints = {
@@ -42,36 +43,51 @@ exports.createEndpoints = function () {
     };
 
     var logoutUser = authEndpoint('logoutUser', POST, '/api/logout/', function (req, res, userId) {
-        /** Fetch user info */
+        /** Log out a user */
         user.logout(userId, function () {
             res.end();
         });
     });
 
-    var fetchUser = authEndpoint('fetchUser', GET, '/api/user/', function (req, res, userId) {
-        /** Fetch user info */
+    var fetchGeneral = authEndpoint('fetchGeneral', GET, '/api/general/', function (req, res, userId) {
+        /** Fetch general info */
         user.getUserById(userId, function (userInfo) {
-            res.send(JSON.stringify(userInfo));
+            var mapInfo = map.get();
+            user.getOtherUsers(userId, function (otherUsers) {
+                res.send(JSON.stringify({
+                    map: mapInfo,
+                    user: userInfo,
+                    otherUsers: otherUsers
+                }));
+            });
+        });
+    });
+
+    var moveUser = authEndpoint('moveUser', POST, '/api/move/', function (req, res, userId) {
+        /* Move a user */
+        map.moveUser(userId, req.body.x, req.body.y, function(error) {
+            if (error == null) {
+                res.end();
+            } else {
+                res.send(JSON.stringify({serverError: error}));
+            }
         });
     });
 
     // Wrapper for endpoints that can only be accessed by an admin.
     var adminEndpoint = function (name, method, path, handler) {
-        endpoint(name, method, path, function (req, res) {
-            auth.getUserId(req, res, function (userId) {
-                if (userId == null) return;
-                user.userIsAdmin(userId, function (isAdmin) {
-                    if (isAdmin == true) {
-                        handler(req, res, userId);
-                    } else {
-                        res.send(JSON.stringify({authError: 'Not an admin'}));
-                    }
-                });
+        authEndpoint(name, method, path, function (req, res, userId) {
+            user.userIsAdmin(userId, function (isAdmin) {
+                if (isAdmin == true) {
+                    handler(req, res, userId);
+                } else {
+                    res.send(JSON.stringify({authError: 'Not an admin'}));
+                }
             });
         });
     };
 
-    var fetchAdmin = adminEndpoint('adminInfo', GET, '/api/admin/', function (req, res, userId) {
+    var fetchAdmin = adminEndpoint('fetchAdmin', GET, '/api/admin/', function (req, res, userId) {
         /** Fetch admin info */
         admin.getAdminInfo(function (adminInfo) {
             res.send(JSON.stringify(adminInfo));
