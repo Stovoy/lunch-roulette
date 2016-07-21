@@ -28,6 +28,7 @@ deploy:
         ports: "8000"
         env:
           - "MODE=release"
+          - "TEAM_NAME=$TEAM_NAME"
           - "SLACK_TEAM=$SLACK_TEAM"
           - "SLACK_CLIENT_ID=$SLACK_CLIENT_ID"
           - "SLACK_CLIENT_SECRET=$SLACK_CLIENT_SECRET"

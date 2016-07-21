@@ -66,7 +66,6 @@ function testGray(r, g, b, a) {
 
 module.exports = {
     process: function (onError) {
-        console.log('Reading map-mask file');
         getPixels(MAP_MASK_FILE, function (err, pixels) {
             var width = pixels.shape[0];
             var height = pixels.shape[1];

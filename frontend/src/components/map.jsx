@@ -9,11 +9,25 @@ var State = {
 
 export var Map = React.createClass({
     getInitialState() {
+        var maxWidth = 800;
+        var maxHeight = 600;
+        // Get as close to max as possible.
+        var widthRatio = this.props.width / maxWidth;
+        var heightRatio = this.props.height / maxHeight;
+        var width = 0;
+        var height = 0;
+        if (widthRatio > heightRatio) {
+            width = maxWidth;
+            height = this.props.height / widthRatio;
+        } else {
+            height = maxHeight;
+            width = this.props.width / heightRatio;
+        }
         return {
-            x: 0,
-            y: 0,
             width: this.props.width,
             height: this.props.height,
+            stretchedWidth: width,
+            stretchedHeight: height,
             user: this.props.user
         }
     },
@@ -21,8 +35,8 @@ export var Map = React.createClass({
     componentDidMount() {
         var canvas = <canvas id="map-canvas"
                              style={{
-                                left: this.state.x,
-                                top: this.state.y
+                                width: this.state.stretchedWidth,
+                                height: this.state.stretchedHeight
                              }}
                              width={this.state.width}
                              height={this.state.height}
@@ -35,9 +49,6 @@ export var Map = React.createClass({
     render() {
         var canvas = document.getElementById('map-canvas');
         if (canvas != null) {
-            $(canvas).css('left', this.state.x);
-            $(canvas).css('top', this.state.y);
-
             this.clearCanvas();
 
             this.drawUser(this.state.user.x, this.state.user.y);
@@ -49,23 +60,16 @@ export var Map = React.createClass({
 
         return (
             <div id="map-container">
+                <div id="map-title">{this.props.teamName} Office</div>
                 <div id="map-canvas-container"></div>
                 <img id="map-img" src="/map/map.svg"
                      style={{
-                        width: this.state.width + 'px',
-                        height: this.state.height + 'px'
+                        width: this.state.stretchedWidth + 'px',
+                        height: this.state.stretchedHeight + 'px'
                      }}
                      onLoad={this.mapLoaded}/>
             </div>
         )
-    },
-
-    mapLoaded() {
-        var node = document.getElementById('map-img');
-        this.setState({
-            x: node.offsetLeft,
-            y: node.offsetTop
-        });
     },
 
     mapMouseMoved(event) {
@@ -99,10 +103,12 @@ export var Map = React.createClass({
     getPosition(event) {
         var canvas = document.getElementById('map-canvas');
         var rect = canvas.getBoundingClientRect();
-        return {
-            x: Math.round(event.clientX - rect.left),
-            y: Math.round(event.clientY - rect.top)
-        }
+        var x = event.clientX - rect.left;
+        var y = event.clientY - rect.top;
+        // Unstretch
+        x = Math.round((this.state.width / this.state.stretchedWidth) * x);
+        y = Math.round((this.state.height / this.state.stretchedHeight) * y);
+        return {x: x, y: y }
     },
 
     setGoodCursor() {
@@ -114,7 +120,7 @@ export var Map = React.createClass({
     },
 
     setNoCursor() {
-        $('#map-canvas').css('cursor', '');
+        $('#map-canvas').css('cursor', 'default');
     },
 
     clearCanvas() {

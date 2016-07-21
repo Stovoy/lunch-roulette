@@ -6,7 +6,8 @@ var MINIFY = JSON.parse(process.env.MINIFY || "0");
 var CONFIG = [
     new webpack.EnvironmentPlugin([
         'SLACK_CLIENT_ID',
-        'SLACK_TEAM'])
+        'SLACK_TEAM',
+        'TEAM_NAME'])
 ];
 
 module.exports = {

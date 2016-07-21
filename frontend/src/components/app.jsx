@@ -2,6 +2,7 @@ import React from 'react';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
+import Avatar from 'material-ui/Avatar';
 import LinearProgress from 'material-ui/LinearProgress';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
@@ -10,13 +11,12 @@ import Snackbar from 'material-ui/Snackbar';
 import Divider from 'material-ui/Divider';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 
-
-import { Grid, Row, Col } from 'react-flexbox-grid';
-
 import { API, ErrorType } from '../api';
 import { deleteCookie } from './auth';
 import { Map } from './map';
 import { Error, hasError, notAnAdmin } from './error';
+
+var teamName = process.env.TEAM_NAME;
 
 export var App = React.createClass({
     getInitialState() {
@@ -59,7 +59,7 @@ export var App = React.createClass({
         }
         return (
             <div>
-                <LunchRouletteBar title="Lunch Roulette"
+                <LunchRouletteBar title={teamName + ' Lunch Roulette'}
                                   user={this.state.user}
                                   admin={this.administrate}
                                   logout={this.logout}/>
@@ -153,7 +153,7 @@ var LunchRouletteBar = React.createClass({
     render() {
         var content = null;
         if (this.props.user) {
-            var buttonStyle = {margin: '7px 0px 0px', color: 'rgb(255, 255, 255)'};
+            var buttonStyle = {color: 'rgb(255, 255, 255)', float: 'left', marginTop: '16px'};
             var adminButton = (
                 <FlatButton label='Admin'
                             onClick={this.props.admin}
@@ -164,10 +164,22 @@ var LunchRouletteBar = React.createClass({
                             onClick={this.props.logout}
                             style={buttonStyle}/>
             );
-            var buttonDivStyle = {marginTop: '8px', marginRight: '-16px', marginLeft: 'auto'};
+            var avatarIcon = null;
+            if (this.props.user.avatar) {
+                avatarIcon = (
+                    <Avatar src={this.props.user.avatar}
+                            size={48}
+                            style={{float: 'left', marginTop: '8px'}}/>
+                );
+            }
+            var buttonDivStyle = {
+                marginRight: '-16px',
+                height: '64px'
+            };
             if (this.props.user.is_admin) {
                 content = (
                     <div style={buttonDivStyle}>
+                        {avatarIcon}
                         {adminButton}
                         {logoutButton}
                     </div>
@@ -175,6 +187,7 @@ var LunchRouletteBar = React.createClass({
             } else {
                 content = (
                     <div style={buttonDivStyle}>
+                        {avatarIcon}
                         {logoutButton}
                     </div>
                 );
@@ -191,7 +204,8 @@ var LunchRouletteBar = React.createClass({
                         }
                         iconStyleLeft={{
                             height: 0
-                        }}>
+                        }}
+                        className="unselectable">
                     {content}
                 </AppBar>
             </div>
@@ -206,33 +220,25 @@ var General = React.createClass({
         var text = null;
         if (user.x == -1 || user.y == -1) {
             text = (
-                <div>
-                    Welcome to Lunch Roulette, {firstName}! Please select where you work on the map.
-                </div>
+                <span>
+                    Welcome to Lunch Roulette, {firstName}! Please select where you work in the office.
+                </span>
             )
         } else {
             text = (
                 <span>
-                    Hi {firstName}. Feel free to edit where you are on the map.
+                    Hi {firstName}. Feel free to edit where you work in the office.
                 </span>
             )
         }
         return (
-            <div>
-                <br/>
-                <Row>
-                    <Col>
-                        {text}
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <Map {...this.props.map}
-                            move={this.props.move}
-                            user={this.props.user}
-                            otherUsers={this.props.otherUsers}/>
-                    </Col>
-                </Row>
+            <div className="main-container">
+                {text}
+                <Map {...this.props.map}
+                     user={this.props.user}
+                     otherUsers={this.props.otherUsers}
+                     move={this.props.move}
+                     teamName={teamName}/>
             </div>
         )
     }

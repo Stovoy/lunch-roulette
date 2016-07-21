@@ -156,10 +156,10 @@ function getOtherUsers(userId, done) {
 
 function saveAvatar(userId, avatar, done) {
     db.query(
-        'UPDATE USER_PROFILE ' +
-        'SET avatar = $2::string ' +
-        'WHERE profile.id = $1::integer',
-        [userId, avatar],
+        'UPDATE USER_PROFILE AS profile ' +
+        'SET avatar = $1::text ' +
+        'WHERE profile.id = $2::integer',
+        [avatar, userId],
         done
     );
 }
