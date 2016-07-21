@@ -7,7 +7,8 @@ export var Map = React.createClass({
             x: 0,
             y: 0,
             width: this.props.width,
-            height: this.props.height
+            height: this.props.height,
+            user: this.props.user
         }
     },
 
@@ -33,7 +34,7 @@ export var Map = React.createClass({
 
             this.clearCanvas();
 
-            this.drawUser(this.props.user.x, this.props.user.y);
+            this.drawUser(this.state.user.x, this.state.user.y);
             for (var i = 0; i < this.props.otherUsers.length; i++) {
                 var otherUser = this.props.otherUsers[i];
                 this.drawOtherUser(otherUser.x, otherUser.y);
@@ -67,8 +68,10 @@ export var Map = React.createClass({
         var y = p.y;
         if (this.pointOpen(x, y)) {
             this.setGoodCursor();
-        } else {
+        } else if (this.pointWalking(x, y) || this.pointOccupied(x, y)) {
             this.setBadCursor();
+        } else {
+            this.setNoCursor();
         }
     },
 
@@ -77,7 +80,13 @@ export var Map = React.createClass({
         var x = p.x;
         var y = p.y;
         if (this.pointOpen(x, y)) {
-            this.props.move(x, y);
+            this.props.move(x, y, function() {
+                // Function to execute if move is valid.
+                this.setState({user: {
+                    x: x,
+                    y: y
+                }});
+            }.bind(this));
         }
     },
 
@@ -96,6 +105,10 @@ export var Map = React.createClass({
 
     setBadCursor() {
         $('#map-canvas').css('cursor', 'url(images/bad-cursor.png) 16 16, pointer');
+    },
+
+    setNoCursor() {
+        $('#map-canvas').css('cursor', '');
     },
 
     clearCanvas() {
@@ -121,5 +134,20 @@ export var Map = React.createClass({
     pointOpen(x, y) {
         var open = this.props.open;
         return x in open && y in open[x];
+    },
+
+    pointWalking(x, y) {
+        var walking = this.props.walking;
+        return x in walking && y in walking[x];
+    },
+
+    pointOccupied(x, y) {
+        for (var i = 0; i < this.props.otherUsers.length; i++) {
+            var otherUser = this.props.otherUsers[i];
+            if (x == otherUser.x && y == otherUser.y) {
+                return true;
+            }
+        }
+        return false;
     }
 });

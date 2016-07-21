@@ -95,13 +95,13 @@ export var App = React.createClass({
             }.bind(this));
         }.bind(this));
     },
-    move(x, y) {
+    move(x, y, okMove) {
         this.loadingWrapper(function (done) {
             API.move(x, y, function (data) {
                 if (hasError(data)) {
                     this.setState({error: data.error});
                 } else {
-                    this.getGeneral();
+                    okMove();
                 }
                 done();
             }.bind(this));
