@@ -64,7 +64,7 @@ function getSlackOAuthURL() {
     var url = 'https://slack.com/oauth/authorize?';
     url += encodeQueryData({
         client_id: slackClientID,
-        redirect_url: window.location.host + '/login/done',
+        redirect_url: window.location.host + '/login',
         team: slackTeam,
         scope: 'identity.basic identity.email'
     });

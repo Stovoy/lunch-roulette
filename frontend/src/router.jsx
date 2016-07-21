@@ -9,7 +9,7 @@ import { LoginDone } from './components/auth';
 var routes = (
     <Router history={browserHistory}>
         <Route path="/" component={AppWrapper}/>
-        <Route path="/login/done" component={LoginDone}/>
+        <Route path="/login" component={LoginDone}/>
     </Router>
 );
 

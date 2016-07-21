@@ -77,7 +77,7 @@ export var App = React.createClass({
                 if (hasError(data)) {
                     this.replaceState({error: data.error});
                 } else {
-                    this.replaceState({general: data});
+                    this.replaceState({general: data, user: data.user});
                 }
                 done();
             }.bind(this));
@@ -167,30 +167,25 @@ var LunchRouletteBar = React.createClass({
             var buttonDivStyle = {marginTop: '8px', marginRight: '-16px', marginLeft: 'auto'};
             if (this.props.user.is_admin) {
                 content = (
-                    <AppBar title={this.props.title}>
-                        <div style={buttonDivStyle}>
-                            {adminButton}
-                            {logoutButton}
-                        </div>
-                    </AppBar>
+                    <div style={buttonDivStyle}>
+                        {adminButton}
+                        {logoutButton}
+                    </div>
                 );
             } else {
                 content = (
-                    <AppBar title={this.props.title}>
-                        <div style={buttonDivStyle}>
-                            {logoutButton}
-                        </div>
-                    </AppBar>
+                    <div style={buttonDivStyle}>
+                        {logoutButton}
+                    </div>
                 );
             }
-        } else {
-            content = (
-                <AppBar title={this.props.title}/>
-            );
         }
         return (
             <div>
-                {content}
+                <AppBar title={this.props.title}
+                        showMenuIconButton={false}>
+                    {content}
+                </AppBar>
             </div>
         )
     }
