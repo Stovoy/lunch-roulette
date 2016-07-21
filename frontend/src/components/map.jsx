@@ -1,6 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+var State = {
+    Open: 0,
+    Walking: 1,
+    Boundary: 2
+};
+
 export var Map = React.createClass({
     getInitialState() {
         return {
@@ -132,13 +138,11 @@ export var Map = React.createClass({
     },
 
     pointOpen(x, y) {
-        var open = this.props.open;
-        return x in open && y in open[x];
+        return this.props.points[x][y] == State.Open;
     },
 
     pointWalking(x, y) {
-        var walking = this.props.walking;
-        return x in walking && y in walking[x];
+        return this.props.points[x][y] == State.Walking;
     },
 
     pointOccupied(x, y) {
