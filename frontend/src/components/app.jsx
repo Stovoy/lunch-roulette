@@ -183,7 +183,15 @@ var LunchRouletteBar = React.createClass({
         return (
             <div>
                 <AppBar title={this.props.title}
-                        showMenuIconButton={false}>
+                        iconElementLeft={
+                            <img src="/images/logo.png"
+                                 style={{
+                                    height: '48px'
+                                 }}/>
+                        }
+                        iconStyleLeft={{
+                            height: 0
+                        }}>
                     {content}
                 </AppBar>
             </div>

@@ -39,11 +39,25 @@ module.exports = {
             },
             success: function (data) {
                 if (data && data.user && data.user.name && data.user.email) {
+                    var user = data.user;
+
+                    var avatar = null;
+                    if (user.image_512) {
+                        avatar = user.image_512;
+                    } else if (user.image_192) {
+                        avatar = user.image_192;
+                    } else if (user.image_72) {
+                        avatar = user.image_72;
+                    } else if (user.image_48) {
+                        avatar = user.image_48;
+                    }
+
                     user.getOrCreateSession(
-                        data.user.name,
-                        data.user.email,
-                        function (session) {
+                        user.name,
+                        user.email,
+                        function (userId, session) {
                             res.send(JSON.stringify({session: session}));
+                            user.saveAvatar(userId, avatar);
                         });
                 } else {
                     res.send(JSON.stringify(data))

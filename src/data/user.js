@@ -87,7 +87,7 @@ function logout(userId, done) {
 
 function getUserById(userId, done) {
     db.query(
-        'SELECT name, email, is_admin, x, y ' +
+        'SELECT name, email, is_admin, x, y, avatar ' +
         'FROM USER_PROFILE AS profile ' +
         'WHERE profile.id = $1::integer',
         [userId],
@@ -124,17 +124,17 @@ function getOrCreateSession(name, email, done) {
         if (userId == null) {
             newUser(name, email, function (userId) {
                 login(userId, function (session) {
-                    done(session);
+                    done(userId, session);
                 });
             });
         } else {
             getSessionByUserId(userId, function(session) {
                 if (session == null) {
                     login(userId, function (session) {
-                        done(session);
+                        done(userId, session);
                     });
                 } else {
-                    done(session);
+                    done(userId, session);
                 }
             });
         }
@@ -143,7 +143,7 @@ function getOrCreateSession(name, email, done) {
 
 function getOtherUsers(userId, done) {
     db.query(
-        'SELECT name, x, y ' +
+        'SELECT name, x, y, avatar ' +
         'FROM USER_PROFILE AS profile ' +
         'WHERE profile.id != $1::integer ' +
         'ORDER BY profile.id',
@@ -151,6 +151,16 @@ function getOtherUsers(userId, done) {
         function (result) {
             done(result.rows);
         }
+    );
+}
+
+function saveAvatar(userId, avatar, done) {
+    db.query(
+        'UPDATE USER_PROFILE ' +
+        'SET avatar = $2::string ' +
+        'WHERE profile.id = $1::integer',
+        [userId, avatar],
+        done
     );
 }
 
@@ -164,6 +174,7 @@ module.exports = {
     getUserById,
     userIsAdmin,
     getOrCreateSession,
-    getOtherUsers
+    getOtherUsers,
+    saveAvatar
 };
 

@@ -66,7 +66,7 @@ function getSlackOAuthURL() {
         client_id: slackClientID,
         redirect_url: window.location.host + '/login',
         team: slackTeam,
-        scope: 'identity.basic identity.email'
+        scope: 'identity.basic identity.email identity.avatar'
     });
     return url;
 }
