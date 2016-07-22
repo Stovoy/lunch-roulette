@@ -5,10 +5,8 @@ import AppBar from 'material-ui/AppBar';
 import Avatar from 'material-ui/Avatar';
 import LinearProgress from 'material-ui/LinearProgress';
 import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Snackbar from 'material-ui/Snackbar';
-import Divider from 'material-ui/Divider';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 
 import { API, ErrorType } from '../api';
@@ -214,33 +212,79 @@ var LunchRouletteBar = React.createClass({
 });
 
 var General = React.createClass({
+    getInitialState() {
+        return {};
+    },
+
     render() {
         var user = this.props.user;
         var firstName = user.name.split(' ')[0];
         var text = null;
         if (user.x == -1 || user.y == -1) {
             text = (
-                <span>
+                <div className="center-text">
                     Welcome to Lunch Roulette, {firstName}! Please select where you work in the office.
-                </span>
+                </div>
             )
         } else {
             text = (
-                <span>
+                <div className="center-text">
                     Hi {firstName}. Feel free to edit where you work in the office.
-                </span>
+                </div>
             )
         }
+        var selected = this.state.selected;
+        var selectedUserInfo = <div className="empty-padding right"/>;
+        if (selected) {
+            var avatar = null;
+            if (selected.avatar) {
+                avatar = (
+                    <Avatar src={selected.avatar}
+                            size={36}
+                            style={{
+                                position: 'absolute',
+                                top: '6px',
+                                left: '4px',
+                                border: '1px solid black'
+                            }}/>
+                );
+            }
+            selectedUserInfo = (
+                <div className="user-info">
+                    {avatar}
+                    <div className="center-text truncate"
+                         style={{
+                             marginTop: '15px'
+                         }}>
+                        {selected.name}
+                    </div>
+                </div>
+            );
+        }
         return (
-            <div className="main-container">
+            <div className="padded-div">
                 {text}
-                <Map {...this.props.map}
-                     user={this.props.user}
-                     otherUsers={this.props.otherUsers}
-                     move={this.props.move}
-                     teamName={teamName}/>
+                <div className="centered-container">
+                    <div className="empty-padding left"/>
+                    <Map {...this.props.map}
+                         user={this.props.user}
+                         otherUsers={this.props.otherUsers}
+                         teamName={teamName}
+                         move={this.props.move}
+                         selectUser={this.selectUser}
+                         deselectUser={this.deselectUser}/>
+                    {selectedUserInfo}
+                </div>
             </div>
         )
+    },
+
+    selectUser(user) {
+        this.setState({selected: user});
+    },
+
+    deselectUser() {
+        this.setState({selected: null});
     }
 });
 

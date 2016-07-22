@@ -1,6 +1,7 @@
 var getPixels = require('get-pixels');
 
 var db = require('./db');
+var user = require('./user');
 
 var MAP_PATH = 'resources/map/';
 var MAP_MASK_FILE = MAP_PATH + 'map-mask.png';
@@ -93,17 +94,49 @@ module.exports = {
             done('Invalid location.');
             return;
         }
-        db.query(
-            'UPDATE USER_PROFILE ' +
-            'SET x = $1::integer, y = $2::integer ' +
-            'WHERE id = $3::integer',
-            [x, y, userId],
-            function() {
-                done(null);
-            });
+        this.queryOccupyingUser(userId, x, y, function(occupyingUser) {
+            if (occupyingUser != null) {
+                done('Invalid location.');
+            }
+            db.query(
+                'UPDATE USER_PROFILE ' +
+                'SET x = $1::integer, y = $2::integer ' +
+                'WHERE id = $3::integer',
+                [x, y, userId],
+                function() {
+                    done(null);
+                });
+        });
     },
 
     isPointOpen(x, y) {
         return processed.points[x][y] == State.Open;
+    },
+
+    queryOccupyingUser(userId, x, y, done) {
+        user.getOtherUsers(userId, function(users) {
+            var minDistance = 4;
+            var occupyingUsers = [];
+            for (var i = 0; i < users.length; i++) {
+                var user = users[i];
+                if (Math.abs(x - user.x) < minDistance &&
+                    Math.abs(y - user.y) < minDistance) {
+                    occupyingUsers.push(user);
+                }
+            }
+            var nearestUser = null;
+            var nearestDistance = Number.MAX_VALUE;
+            for (var i = 0; i < occupyingUsers.length; i++) {
+                var user = occupyingUsers[i];
+                var dX = user.x - x;
+                var dY = user.y - y;
+                var d = Math.sqrt(dX * dX + dY * dY);
+                if (d < nearestDistance) {
+                    nearestDistance = d;
+                    nearestUser = user;
+                }
+            }
+            done(nearestUser);
+        });
     }
 };

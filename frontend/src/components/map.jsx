@@ -44,9 +44,29 @@ export var Map = React.createClass({
                              onClick={this.mapClicked}/>;
 
         ReactDOM.render(canvas, document.getElementById('map-canvas-container'));
+        this.renderCanvas();
     },
 
     render() {
+        this.renderCanvas();
+
+        return (
+            <div id="map-container" style={{
+                width: this.state.stretchedWidth + 10 + 'px',
+                height: this.state.stretchedHeight + 10 + 'px'
+            }}>
+                <div id="map-title">{this.props.teamName} Office</div>
+                <div id="map-canvas-container"/>
+                <img id="map-img" src="/map/map.svg"
+                     style={{
+                        width: this.state.stretchedWidth + 'px',
+                        height: this.state.stretchedHeight + 'px'
+                     }}/>
+            </div>
+        )
+    },
+
+    renderCanvas() {
         var canvas = document.getElementById('map-canvas');
         if (canvas != null) {
             this.clearCanvas();
@@ -57,31 +77,29 @@ export var Map = React.createClass({
                 this.drawOtherUser(otherUser.x, otherUser.y);
             }
         }
-
-        return (
-            <div id="map-container">
-                <div id="map-title">{this.props.teamName} Office</div>
-                <div id="map-canvas-container"></div>
-                <img id="map-img" src="/map/map.svg"
-                     style={{
-                        width: this.state.stretchedWidth + 'px',
-                        height: this.state.stretchedHeight + 'px'
-                     }}
-                     onLoad={this.mapLoaded}/>
-            </div>
-        )
     },
 
     mapMouseMoved(event) {
         var p = this.getPosition(event);
         var x = p.x;
         var y = p.y;
-        if (this.pointOpen(x, y)) {
-            this.setGoodCursor();
-        } else if (this.pointWalking(x, y) || this.pointOccupied(x, y)) {
+        var occupyingUser = this.getNearestOccupyingUser(x, y);
+        if (occupyingUser) {
+            this.selected = true;
+            this.props.selectUser(occupyingUser);
             this.setBadCursor();
         } else {
-            this.setNoCursor();
+            if (this.selected) {
+                this.props.deselectUser();
+                this.selected = false;
+            }
+            if (this.pointOpen(x, y)) {
+                this.setGoodCursor();
+            } else if (this.pointWalking(x, y)) {
+                this.setBadCursor();
+            } else {
+                this.setNoCursor();
+            }
         }
     },
 
@@ -89,7 +107,7 @@ export var Map = React.createClass({
         var p = this.getPosition(event);
         var x = p.x;
         var y = p.y;
-        if (this.pointOpen(x, y)) {
+        if (this.pointOpen(x, y) && this.getNearestOccupyingUser(x, y) == null) {
             this.props.move(x, y, function() {
                 // Function to execute if move is valid.
                 this.setState({user: {
@@ -151,13 +169,28 @@ export var Map = React.createClass({
         return this.props.points[x][y] == State.Walking;
     },
 
-    pointOccupied(x, y) {
+    getNearestOccupyingUser(x, y) {
+        var minDistance = 4;
+        var occupyingUsers = [];
         for (var i = 0; i < this.props.otherUsers.length; i++) {
-            var otherUser = this.props.otherUsers[i];
-            if (x == otherUser.x && y == otherUser.y) {
-                return true;
+            var user = this.props.otherUsers[i];
+            if (Math.abs(x - user.x) < minDistance &&
+                Math.abs(y - user.y) < minDistance) {
+                occupyingUsers.push(user);
             }
         }
-        return false;
+        var nearestUser = null;
+        var nearestDistance = Number.MAX_VALUE;
+        for (var i = 0; i < occupyingUsers.length; i++) {
+            var user = occupyingUsers[i];
+            var dX = user.x - x;
+            var dY = user.y - y;
+            var d = Math.sqrt(dX * dX + dY * dY);
+            if (d < nearestDistance) {
+                nearestDistance = d;
+                nearestUser = user;
+            }
+        }
+        return nearestUser;
     }
 });
