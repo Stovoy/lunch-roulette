@@ -1,12 +1,12 @@
+default: run
+
 WORKSPACE_DIR ?= workspace
 BUILD_DIR = $(WORKSPACE_DIR)/build
 
 .PHONY: app frontend build run
 
-default: run
-
 app:
-	npm install
+	yarn install
 
 frontend:
 	make -C frontend compile

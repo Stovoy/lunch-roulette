@@ -1,15 +1,35 @@
 box: node
 deploy:
   steps:
-    - npm-install
-    - npm-test
     - script:
-        name: Install dependencies
+        name: Install unix dependencies
         code: |
           apt-get update
           apt-get install -y nginx
-    - npm-install:
+
+    - script:
+        name: Install yarn
+        code: |
+          npm install -g yarn
+
+    - script:
+        name: Set yarn cache
+        code: |
+          export YARN_CACHE=$WERCKER_CACHE_DIR/yarn
+
+    - script:
+        name: Install app yarn dependencies
+        code: |
+          HOME=$YARN_CACHE yarn
+
+    - npm-test
+
+    - script:
+        name: Install frontend yarn dependencies
+        code: |
+          HOME=$YARN_CACHE yarn
         cwd: frontend
+
     - script:
         name: Install to /app
         code: |
@@ -19,6 +39,7 @@ deploy:
           mv resources /app/resources
           mv node_modules /app/node_modules
           mkdir /app/logs
+
     - internal/docker-push:
         username: $USERNAME
         password: $PASSWORD
@@ -35,6 +56,7 @@ deploy:
           - "MAP_MASK_URL=$MAP_MASK_URL"
           - "PGHOST=$$DATABASE_HOST"
         entrypoint: "/bin/bash /app/resources/entrypoint.sh"
+
     - swaggy/deploy-to-rancher:
         access_key: $RANCHER_ACCESS_KEY
         secret_key: $RANCHER_SECRET_KEY
