@@ -84,6 +84,7 @@ export var App = React.createClass({
     administrate() {
         this.loadingWrapper(function (done) {
             API.admin(function (data) {
+                data.lunchRoulette = {secretQuestion: 'Please enter an icebreaker question.'};
                 if (hasError(data)) {
                     this.setState({error: data.error});
                 } else {
@@ -289,10 +290,27 @@ var General = React.createClass({
 });
 
 var Admin = React.createClass({
+    componentDidMount() {
+        this.setState({lunchRoulette: this.props.data.lunchRoulette});
+    },
+
+    getInitialState() {
+        return {
+            lunchRoulette: {
+                secretQuestion: 'N/A'
+            }
+        }
+    },
+
     render() {
         var users = this.props.data.users;
+        var secretQuestion = this.state.lunchRoulette.secretQuestion;
         return (
             <div>
+                <div className="secret-question">
+                    <input value={secretQuestion}
+                           onChange={this.changeSecretQuestion}/>
+                </div>
                 <Table>
                     <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                         <TableRow>
@@ -328,10 +346,26 @@ var Admin = React.createClass({
                         })}
                     </TableBody>
                 </Table>
+                <RaisedButton label='Save'
+                              onClick={this.save}
+                              primary={true}
+                              style={{marginTop: '10px', marginRight: '10px'}}/>
                 <RaisedButton label='Back'
                               onClick={this.props.back}
                               style={{marginTop: '10px'}}/>
             </div>
         )
+    },
+
+    changeSecretQuestion(event) {
+        this.setState({state:
+            Object.assign({}, this.state.lunchRoulette, {
+                secretQuestion: event.target.value,
+            })
+        });
+    },
+
+    save() {
+        this.props.save(this.state);
     }
 });

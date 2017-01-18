@@ -15,9 +15,9 @@ CREATE TABLE USER_SESSION (
   date_created timestamp default current_timestamp
 );
 
-CREATE TABLE STATE (
+CREATE TABLE LUNCH_ROULETTE (
   spun BOOL NOT NULL,
   question VARCHAR(140) NOT NULL
 );
 
-INSERT INTO STATE VALUES (FALSE, 'Please enter an icebreaker question.');
+INSERT INTO LUNCH_ROULETTE VALUES (FALSE, 'Please enter an icebreaker question.');
