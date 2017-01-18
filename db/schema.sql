@@ -14,3 +14,10 @@ CREATE TABLE USER_SESSION (
   session CHAR(36) NOT NULL,
   date_created timestamp default current_timestamp
 );
+
+CREATE TABLE STATE (
+  spun BOOL NOT NULL,
+  question VARCHAR(140) NOT NULL
+);
+
+INSERT INTO STATE VALUES (FALSE, 'Please enter an icebreaker question.');
