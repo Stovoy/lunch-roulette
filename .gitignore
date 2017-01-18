@@ -1,5 +1,5 @@
 build/
-resources/bundle.js
+resources/gen/bundle.js
 resources/map/
 node_modules/
 

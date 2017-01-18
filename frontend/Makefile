@@ -1,15 +1,15 @@
 default: compile
 
-.PHONY: install compile prod-compile watch
+.PHONY: deps compile prod-compile watch
 
-install:
+deps:
 	yarn install
 
-compile: install
+compile:
 	./node_modules/webpack/bin/webpack.js \
 		--progress --colors
 
-prod-compile: install
+prod-compile:
 	MINIFY=1 ./node_modules/webpack/bin/webpack.js \
 		--progress --colors
 
