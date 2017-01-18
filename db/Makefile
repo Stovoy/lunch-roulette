@@ -38,6 +38,15 @@ psql:
 		-h $(PGHOST) \
 		-p $(PGPORT)
 
+admin:
+	PGPASSWORD=$(PGPASS) \
+	psql \
+		-d $(PGDB) \
+		-U $(PGUSER) \
+		-h $(PGHOST) \
+		-p $(PGPORT) \
+		-c 'UPDATE USER_PROFILE SET is_admin = true'
+
 reset:
 	docker rm -f lunch-roulette-db || true
 	rm -rf $$HOME/data/lunchroulette
