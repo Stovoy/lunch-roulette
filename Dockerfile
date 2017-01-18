@@ -8,7 +8,7 @@ ADD resources /app/resources
 ADD src /app/src
 RUN mkdir -p /app/logs
 
-EXPOSE 80 443
+EXPOSE 80
 
 ENV MODE dev
 

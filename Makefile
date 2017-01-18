@@ -39,5 +39,4 @@ run:
 		-e PGHOST=$(PGHOST) \
 		-e PGPORT=$(PGPORT) \
 		-p 0.0.0.0:80:80 \
-		-p 0.0.0.0:443:443 \
 		-it lunch-roulette
