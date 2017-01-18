@@ -20,6 +20,7 @@ build:
 exec:
 	docker exec -it lunch-roulette sh
 
+SOURCE_DIR ?= $(shell pwd)
 PGHOST=db
 PGPORT=5432
 
@@ -27,9 +28,9 @@ run:
 	docker rm -f lunch-roulette || true
 	docker run \
 		--name lunch-roulette \
-		-v $(shell pwd)/src:/app/src \
-		-v $(shell pwd)/resources:/app/resources \
-		-v $(shell pwd)/node_modules:/app/node_modules \
+		-v $(SOURCE_DIR)/src:/app/src \
+		-v $(SOURCE_DIR)/resources:/app/resources \
+		-v $(SOURCE_DIR)/node_modules:/app/node_modules \
 		-e SLACK_TEAM=$$SLACK_TEAM \
 		-e SLACK_CLIENT_ID=$$SLACK_CLIENT_ID \
 		-e SLACK_CLIENT_SECRET=$$SLACK_CLIENT_SECRET \
