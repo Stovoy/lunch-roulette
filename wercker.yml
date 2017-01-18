@@ -31,6 +31,12 @@ deploy:
         cwd: frontend
 
     - script:
+        name: Build frontend bundle
+        code: |
+          make prod-compile
+        cwd: frontend
+
+    - script:
         name: Install to /app
         code: |
           mkdir /app

@@ -1,9 +1,9 @@
-default: run
+default: build run
 
 WORKSPACE_DIR ?= workspace
 BUILD_DIR = $(WORKSPACE_DIR)/build
 
-.PHONY: app frontend build run
+.PHONY: app frontend watch build exec run
 
 app:
 	yarn install
@@ -11,14 +11,14 @@ app:
 frontend:
 	make -C frontend compile
 
+watch:
+	make -C frontend watch
+
 build:
 	docker build -t lunch-roulette .
 
-watch:
-	cd frontend && make watch
-
 exec:
-	docker exec -it lunch-roulette bash
+	docker exec -it lunch-roulette sh
 
 PGHOST=db
 PGPORT=5432

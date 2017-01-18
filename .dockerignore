@@ -1,1 +1,5 @@
-.git
+# Ignore everything except what the Docker container needs.
+*
+!node_modules
+!resources
+!src

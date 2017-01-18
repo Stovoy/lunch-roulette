@@ -2,3 +2,7 @@ build/
 resources/bundle.js
 resources/map/
 node_modules/
+
+resources/fullchain.pem
+resources/privkey.pem
+resources/dhparam.pem
